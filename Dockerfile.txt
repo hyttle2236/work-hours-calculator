@@ -1,9 +1,0 @@
-FROM python:3.13-slim  
-LABEL "language"="python"  
-LABEL "framework"="flet"  
-WORKDIR /app  
-COPY . .  
-RUN pip install --no-cache-dir --upgrade pip && \  
-    pip install --no-cache-dir flet nest_asyncio supabase  
-EXPOSE 8080  
-CMD ["python3", "-c", "import flet as ft; import sys; sys.path.insert(0, '/app'); from main import main; ft.run(target=main, view=ft.AppView.FLET_APP, port=8080, host='0.0.0.0')"]  
