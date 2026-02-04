@@ -325,17 +325,17 @@ def main(page: ft.Page):
             uid = u['id']
             name = u['name']
             workshop = u['workshop']
-            card = ft.Card(content=ft.Container(
-                content=ft.ListTile(
-                    leading=ft.Icon(ft.icons.PERSON),
-                    title=ft.Text(f"{name} ({uid})"),
-                    subtitle=ft.Text(f"{workshop}"),
-                    trailing=ft.Icon(ft.icons.ARROW_FORWARD_IOS, size=14),
-                    on_click=handle_admin_click_user,
-                    data=uid
-                ),
-                padding=10
-            ))
+            card = ft.Card(content=ft.Container(  
+    content=ft.ListTile(  
+        leading=ft.Icon(ft.icons.PERSON),  
+        title=ft.Text(f"{name} ({uid})"),  
+        subtitle=ft.Text(f"{workshop}"),  
+        trailing=ft.Icon(ft.icons.ARROW_FORWARD_IOS, size=14),  
+        on_click=handle_admin_click_user,  
+        data=uid  
+    ),  
+    padding=10  
+))  
             lv.controls.append(card)
 
         page.add(ft.Column([
@@ -421,3 +421,4 @@ def main(page: ft.Page):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     ft.app(target=main, view=ft.AppView.WEB_BROWSER, port=port, host="0.0.0.0")
+
