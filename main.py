@@ -155,7 +155,7 @@ def main(page: ft.Page):
     rows=[]  
 )  
 
-        heading_row_color="#E3F2FD",
+    heading_row_color="#E3F2FD",
         columns=[
             ft.DataColumn(ft.Text("车次", weight="bold")),
             ft.DataColumn(ft.Text("出勤", weight="bold")),
@@ -402,6 +402,7 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main, view=ft.AppView.WEB, port=8080, host="0.0.0.0")
+
 
 
 
