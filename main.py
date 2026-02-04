@@ -375,12 +375,11 @@ def main(page: ft.Page):
             ])
         )
         update_table()
-
-    if current_user:
-        show_main_interface()
-    else:
-        show_login_interface()
-   if __name__ == "__main__":  
+if current_user:  
+        show_main_interface()  
+    else:  
+        show_login_interface()  
+if __name__ == "__main__":  
     port = int(os.environ.get("PORT", 8080))  
     print(f"正在启动服务，监听端口: {port}")  
     ft.app(target=main, view=ft.AppView.WEB_BROWSER, port=port, host="0.0.0.0")  
