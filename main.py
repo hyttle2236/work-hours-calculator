@@ -404,7 +404,7 @@ def main(page: ft.Page):
         logged_in_user_id = None
         page.add(ft.Column([
             ft.Container(height=50),
-            ft.Icon(ft.icons.ACCESS_TIME_FILLED, size=60, color="blue"),
+            ft.Icon(ft.icons.SCHEDULE, size=60, color="blue"),  
             ft.Text("云端工时本", size=24, weight="bold"),
             ft.Text("企业版 v1.0", size=14, color="grey"),
             ft.Container(height=30),
@@ -421,4 +421,5 @@ def main(page: ft.Page):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     ft.app(target=main, view=ft.AppView.WEB_BROWSER, port=port, host="0.0.0.0")
+
 
