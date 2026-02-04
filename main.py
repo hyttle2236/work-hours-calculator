@@ -380,12 +380,9 @@ def main(page: ft.Page):
         show_main_interface()
     else:
         show_login_interface()
-if __name__ == "__main__":
     # 【修复核心 1】获取 Zeabur 分配的端口，如果没有则默认 8080
     port = int(os.environ.get("PORT", 8080))
-    
     print(f"🚀 服务正在启动，监听端口: {port}")
-    
     # 【修复核心 2】
     # view=ft.AppView.WEB_BROWSER : 强制 Web 模式
     # host="0.0.0.0" : 允许外部访问 (解决 502 的关键)
