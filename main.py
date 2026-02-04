@@ -375,7 +375,7 @@ def main(page: ft.Page):
             ])
         )
         update_table()
-if current_user:  
+    if current_user:  
         show_main_interface()  
     else:  
         show_login_interface()  
