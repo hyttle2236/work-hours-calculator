@@ -386,3 +386,13 @@ if __name__ == "__main__":
         ft.app(target=main, view="web_browser")
     except:
         ft.app(target=main)
+# ... (上面的代码不用动)
+
+if __name__ == "__main__":
+    # 必须从环境变量获取 PORT，否则 Zeabur 无法连接
+    port = int(os.environ.get("PORT", 8080))
+    
+    print(f"正在启动服务，监听端口: {port}")
+    
+    # 核心修正：host="0.0.0.0" 允许外部访问
+    ft.app(target=main, view=ft.AppView.WEB_BROWSER, port=port, host="0.0.0.0")
