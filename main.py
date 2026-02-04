@@ -137,12 +137,24 @@ def main(page: ft.Page):
     data_table = ft.DataTable(  
     width=float("inf"),  
     bgcolor="white",  
-    border=ft.border.Border(    
-    left=ft.border.BorderSide(1, "#eeeeee"),    
-    right=ft.border.BorderSide(1, "#eeeeee"),    
-    top=ft.border.BorderSide(1, "#eeeeee"),    
-    bottom=ft.border.BorderSide(1, "#eeeeee")  
-        border_radius=10,  # ← 这里缺少右括号 )  
+    border=ft.border.Border(  
+        left=ft.border.BorderSide(1, "#eeeeee"),  
+        right=ft.border.BorderSide(1, "#eeeeee"),  
+        top=ft.border.BorderSide(1, "#eeeeee"),  
+        bottom=ft.border.BorderSide(1, "#eeeeee")  
+    ),  
+    border_radius=10,  
+    heading_row_color="#E3F2FD",  
+    columns=[  
+        ft.DataColumn(ft.Text("车次", weight="bold")),  
+        ft.DataColumn(ft.Text("出勤", weight="bold")),  
+        ft.DataColumn(ft.Text("退勤", weight="bold")),  
+        ft.DataColumn(ft.Text("工时", weight="bold"), numeric=True),  
+        ft.DataColumn(ft.Text("操作", weight="bold")),  
+    ],  
+    rows=[]  
+)  
+
         heading_row_color="#E3F2FD",
         columns=[
             ft.DataColumn(ft.Text("车次", weight="bold")),
@@ -390,5 +402,6 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main, view=ft.AppView.WEB, port=8080, host="0.0.0.0")
+
 
 
