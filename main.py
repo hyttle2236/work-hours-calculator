@@ -301,4 +301,4 @@ def main(page: ft.Page):
         for i, r in enumerate(current_records):
             try:
                 dt_start_full = datetime.datetime.strptime(f"{r['date']} {r['start']}", "%Y-%m-%d %H:%M")
-                start_str = dt_start_full.strftime("%m-%
+               start_str = dt_start_full.strftime("%m-%d %H:%M") 
