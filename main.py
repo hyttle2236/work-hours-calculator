@@ -34,7 +34,6 @@ def load_data_by_id(user_id):
         if response.data and len(response.data) > 0:
             return response.data[0]['data']
         else:
-            # 如果是新用户，数据库里还没有他的行，返回空结构
             return {"user_info": None, "work_records": []}
     except Exception as e:
         print(f"读取数据失败: {e}")
@@ -47,7 +46,6 @@ def save_data_by_id(user_id, data):
     
     try:
         # 使用 upsert (有则更新，无则插入)
-        # 将数据存入对应工号的那一行
         payload = {"user_id": str(user_id), "data": data}
         supabase.table('user_records').upsert(payload).execute()
     except Exception as e:
@@ -77,7 +75,6 @@ def main(page: ft.Page):
         ))
 
     # === 全局状态 ===
-    # 注意：这里不再自动加载，而是等登录
     current_user_id = None 
     current_user_info = None
     current_records = []
@@ -88,7 +85,10 @@ def main(page: ft.Page):
 
     # === 组件 ===
     txt_name = ft.TextField(label="姓名")
-    txt_id = ft.TextField(label="工号 (将作为账号)", keyboard_type="number", suffix_text="必填")
+    
+    # 【修复】删除了 suffix_text 参数，改在 label 里提示
+    txt_id = ft.TextField(label="工号 (必填，唯一账号)", keyboard_type="number")
+    
     txt_workshop = ft.TextField(label="车间")
     txt_fleet = ft.TextField(label="车队")
 
@@ -186,7 +186,7 @@ def main(page: ft.Page):
             current_user_info = saved_info
             current_records = cloud_data.get("work_records", [])
             
-            # 自动填回输入框，方便用户确认
+            # 自动填回输入框
             txt_name.value = saved_info.get("name", "")
             txt_workshop.value = saved_info.get("workshop", "")
             txt_fleet.value = saved_info.get("fleet", "")
@@ -199,14 +199,12 @@ def main(page: ft.Page):
                 "fleet": txt_fleet.value
             }
             current_records = []
-            # 初始化该用户的云端存档
             sync_to_cloud()
 
         page.splash = None
         show_main_interface()
 
     def sync_to_cloud():
-        # 封装保存逻辑
         if current_user_id:
             full_data = {
                 "user_info": current_user_info,
@@ -247,7 +245,7 @@ def main(page: ft.Page):
         elif editing_index is not None and index < editing_index:
             editing_index -= 1
         current_records.pop(index)
-        sync_to_cloud() # 同步
+        sync_to_cloud() 
         update_table()
 
     def calculate_hours(e):
@@ -291,7 +289,7 @@ def main(page: ft.Page):
                 txt_train_no.value = ""
                 chk_deadhead.value = False
             
-            sync_to_cloud() # 同步
+            sync_to_cloud() 
             update_table()
         except ValueError:
             page.snack_bar = ft.SnackBar(ft.Text("日期格式错误"))
@@ -303,117 +301,4 @@ def main(page: ft.Page):
         for i, r in enumerate(current_records):
             try:
                 dt_start_full = datetime.datetime.strptime(f"{r['date']} {r['start']}", "%Y-%m-%d %H:%M")
-                start_str = dt_start_full.strftime("%m-%d %H:%M")
-            except:
-                start_str = f"{r['date'][5:]} {r['start']}"
-
-            data_table.rows.append(
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text(r['train'])),
-                        ft.DataCell(ft.Text(start_str, size=12)),
-                        ft.DataCell(ft.Text(r['end'], size=12)),
-                        ft.DataCell(ft.Text(str(r['duration']), weight="bold", color="blue")),
-                        ft.DataCell(
-                            ft.Row([
-                                ft.TextButton("修改", icon="edit", style=ft.ButtonStyle(color="blue"), data=i, on_click=load_record_for_edit),
-                                ft.TextButton("删除", icon="delete", style=ft.ButtonStyle(color="red"), data=i, on_click=delete_record_action)
-                            ], spacing=0)
-                        ),
-                    ]
-                )
-            )
-        total_h = sum([r['duration'] for r in current_records])
-        txt_total_hours.value = f"累计工时: {total_h} 小时"
-        page.update()
-
-    txt_total_hours = ft.Text("累计工时: 0 小时", size=18, weight="bold", color="blue")
-
-    def export_data(e):
-        if not current_records: return
-        output = io.StringIO()
-        writer = csv.writer(output)
-        writer.writerow(["日期", "车次", "开始", "结束", "工时", "备注"])
-        for r in current_records:
-            writer.writerow([r['date'], r['train'], r['start'], r['end'], r['duration'], r['note']])
-        encoded = urllib.parse.quote(output.getvalue())
-        page.launch_url(f"data:text/csv;charset=utf-8,\ufeff{encoded}")
-
-    def clear_data(e):
-        current_records.clear()
-        sync_to_cloud() # 同步
-        update_table()
-
-    def logout(e):
-        nonlocal current_user_id, current_user_info, current_records
-        # 清空本地状态
-        current_user_id = None
-        current_user_info = None
-        current_records = []
-        show_login_interface()
-
-    def show_login_interface():
-        page.clean()
-        page.add(
-            ft.Column([
-                ft.Text("工时计算器 (多用户版)", size=30, weight="bold", color="black"),
-                ft.Text("请输入工号登录或注册", color="grey"),
-                txt_name, 
-                txt_id, 
-                txt_workshop, 
-                txt_fleet,
-                Btn("进入系统", on_click=login_action, width=200)
-            ], alignment="center", horizontal_alignment="center")
-        )
-
-    def show_main_interface():
-        page.clean()
-        bj_now = get_beijing_now()
-        if not txt_start_time.value:
-            txt_start_time.value = bj_now.strftime("%Y-%m-%d %H:%M")
-        if not txt_end_time.value:
-            txt_end_time.value = (bj_now + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M")
-        btn_submit.on_click = calculate_hours
-        btn_cancel_edit.on_click = cancel_edit_action
-        
-        page.add(
-            ft.Column([
-                ft.Row([
-                    ft.Column([
-                        ft.Text(f"欢迎, {current_user_info['name']}", size=16, weight="bold"),
-                        ft.Text(f"工号: {current_user_id}", size=12, color="grey"),
-                    ]),
-                    ft.TextButton("切换账号", icon="logout", on_click=logout)
-                ], alignment="spaceBetween"),
-                ft.Divider(),
-                ft.Text("录入工时", weight="bold", size=16),
-                ft.Row([txt_train_no, chk_deadhead]),
-                txt_start_time,
-                txt_end_time,
-                ft.Row([btn_submit, btn_cancel_edit]),
-                ft.Divider(),
-                ft.Row([
-                    txt_total_hours,
-                    ft.Row([
-                        ft.OutlinedButton("清空", icon="delete_forever", on_click=clear_data),
-                        ft.OutlinedButton("导出", icon="download", on_click=export_data)
-                    ])
-                ], alignment="spaceBetween"),
-                ft.Container(
-                    content=ft.Column([data_table], scroll="auto"), 
-                    border=ft.Border.all(1, "#eeeeee"),
-                    border_radius=10,
-                )
-            ])
-        )
-        update_table()
-
-    show_login_interface()
-    if current_user:  
-        show_main_interface()  
-    else:  
-        show_login_interface()  
-if __name__ == "__main__":  
-    port = int(os.environ.get("PORT", 8080))  
-    print(f"正在启动服务，监听端口: {port}")  
-    ft.app(target=main, view=ft.AppView.WEB_BROWSER, port=port, host="0.0.0.0")  
+                start_str = dt_start_full.strftime("%m-%
