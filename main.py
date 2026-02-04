@@ -137,7 +137,11 @@ def main(page: ft.Page):
     data_table = ft.DataTable(
         width=float("inf"),
         bgcolor="white",
-        border=ft.Border.all(1, "#eeeeee"),
+        border=ft.border.Border(  
+    left=ft.border.BorderSide(1, "#eeeeee"),  
+    right=ft.border.BorderSide(1, "#eeeeee"),  
+    top=ft.border.BorderSide(1, "#eeeeee"),  
+    bottom=ft.border.BorderSide(1, "#eeeeee")
         border_radius=10,
         heading_row_color="#E3F2FD",
         columns=[
@@ -386,3 +390,4 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main, view=ft.AppView.WEB, port=8080, host="0.0.0.0")
+
